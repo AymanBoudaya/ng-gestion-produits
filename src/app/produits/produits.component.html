@@ -1,0 +1,60 @@
+<div>  
+    <h1> Fiche Produit </h1>
+    <form>
+      <div class="form-group">
+        <label for="id">Id:</label>
+        <input type="text" id="id" name="id" [value]="produitEnCours?.id || ''" readonly>
+      </div>
+      <div class="form-group">
+        <label for="code">Code:</label>
+        <input type="text" id="code" name="code" [(ngModel)]="produitEnCours.code">
+      </div>
+      <div class="form-group">
+        <label for="designation">Désignation:</label>
+        <input type="text" id="designation" name="designation" [(ngModel)]="produitEnCours.designation">
+      </div>
+      <div class="form-group">
+        <label for="prix">Prix:</label>
+        <input type="number" id="prix" name="prix" [(ngModel)]="produitEnCours.prix" step="0.01">
+      </div>
+      <div>
+        <button type="button" class="submit-button" (click)="validerModification()">Valider</button>
+      </div>
+    </form>
+    
+    <h1> liste des produits </h1> 
+    <!-- <app-entete></app-entete> --> 
+   
+    <table> 
+      <thead> 
+        <tr> 
+      <th> Id </th>    <th> Code </th>     <th> Designation </th>
+      <th> Prix </th>   <th> Actions </th> 
+    </tr> 
+    </thead> 
+    <tbody> 
+       <tr *ngFor = "let p of produits"> 
+          <td>  {{p.id}}</td> 
+          <td>  {{p.code}}</td> 
+          <td>  {{p.designation}}</td> 
+          <td>  {{p.prix}}</td>
+          <td> 
+            <button class="edit-button">Editer</button> 
+            <button (click)="editerProduit(p)" class="delete-button">
+            Supprimer</button> </td>
+         </tr> 
+      </tbody> 
+     </table>  
+  </div>
+
+  <!-- Boîte de dialogue -->
+<div class="dialog-overlay" *ngIf="afficherDialogue">
+    <div class="dialog-box">
+      <h2>Confirmation</h2>
+      <p>Êtes-vous sûr de vouloir supprimer ce produit ?</p>
+      <div class="dialog-actions">
+        <button (click)="confirmerSuppression()">Oui</button>
+        <button (click)="fermerDialogue()">Annuler</button>
+      </div>
+    </div>
+  </div>
