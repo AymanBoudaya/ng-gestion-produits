@@ -7,9 +7,9 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   actions:Array<any> = [
-    {  titre :"Accueil", route:"/accueil"},
-    {  titre :"Liste des produits", route:"/produits"},
-    {  titre :"Ajouter Produit", route:"/ajouterProduit"},
+    {  titre :"Accueil", route:"/accueil", icon: "bi-house-fill"},
+    {  titre :"Liste des produits", route:"/produits", icon : "bi-database-fill"},
+    {  titre :"Ajouter Produit", route:"/ajouterProduit", icon : "bi-database-fill-add"},
   ]
 
   actionCourante:any;
