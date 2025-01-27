@@ -1,101 +1,171 @@
-<div *ngIf="EditMode" class="container mt-4" >
-  <div class="card">
-    <div class="card-header">
-      <h1>Fiche Produit</h1>
+<div *ngIf="EditMode" class="container mt-4">
+  <div class="card shadow rounded">
+    <div class="card-header bg-primary text-white">
+      <h3 class="mb-0">Fiche Produit</h3>
     </div>
     <div class="card-body">
-      <form #produitForm="ngForm" (ngSubmit)="validerFormulaire(produitForm)">
-        <table class="table">
-          <tr>
-            <td>Id:</td>
-            <td>
-              <input
-                id="id"
-                name="id"
-                type="text"
-                [(ngModel)]="produitCourant.id"
-                required
-                readonly
-                class="form-control"
-              />
-            </td>
-          </tr>
-          <tr>
-            <td>Code:</td>
-            <td>
-              <input class="form-control" type="text" name="code" [(ngModel)]="produitCourant.code" />
-            </td>
-          </tr>
-          <tr>
-            <td>Désignation:</td>
-            <td>
-              <input
+      <form (ngSubmit)="validerFormulaire()">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="id" class="form-label">Id:</label>
+            <input
+              id="id"
+              name="id"
+              type="text"
+              [(ngModel)]="produitCourant.id"
+              readonly
               class="form-control"
-                type="text"
-                name="designation"
-                [(ngModel)]="produitCourant.designation"
-              />
-            </td>
-          </tr>
-          <tr>
-            <td>Prix:</td>
-            <td>
-              <input class="form-control" type="text" name="prix" [(ngModel)]="produitCourant.prix" />
-            </td>
-          </tr>
-          <tr>
-            <td [align]="'center'" colspan="2">
-              <input
-              class="btn btn-success btn-lg"
-                type="submit"
-                value="Valider"
-                [disabled]="!produitForm.form.valid"
-              />
-            </td>
-          </tr>
-        </table>
+            />
+          </div>
+          <div class="col-md-6">
+            <label for="code" class="form-label">Code:</label>
+            <input
+              id="code"
+              class="form-control"
+              type="text"
+              name="code"
+              [(ngModel)]="produitCourant.code"
+              required
+            />
+          </div>
+          <div class="col-md-6">
+            <label for="designation" class="form-label">Désignation:</label>
+            <input
+              id="designation"
+              class="form-control"
+              type="text"
+              name="designation"
+              [(ngModel)]="produitCourant.designation"
+              required
+            />
+          </div>
+          <div class="col-md-6">
+            <label for="prix" class="form-label">Prix:</label>
+            <input
+              id="prix"
+              class="form-control"
+              type="number"
+              name="prix"
+              [(ngModel)]="produitCourant.prix"
+              required
+            />
+          </div>
+          <div class="col-md-6">
+            <label for="categorie" class="form-label">Catégorie:</label>
+            <select
+              id="categorie"
+              class="form-select"
+              name="categorie"
+              [(ngModel)]="produitCourant.categorie"
+              required
+            >
+              <option
+                *ngFor="let categorie of categories"
+                [ngValue]="categorie"
+              >
+                {{ categorie.libelle }}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="mt-4 text-center">
+          <button class="btn btn-success btn-lg" type="submit">Valider</button>
+          <button
+            class="btn btn-secondary btn-lg ms-3"
+            type="button"
+            (click)="EditMode = false"
+          >
+            Annuler
+          </button>
+        </div>
       </form>
     </div>
   </div>
-
 </div>
-<div class="container mt-4">
-  <div class="card">
-    <div class="card-header">
-      <h1>liste des produits</h1>
-    </div>
-    <div class="card-body">
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>Id</th>
-            <th>Code</th>
-            <th>Designation</th>
-            <th>Prix</th>
-            <th colspan="2">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let p of produits">
-            <td>{{ p.id }}</td>
-            <td>{{ p.code }}</td>
-            <td>{{ p.designation }}</td>
-            <td>{{ p.prix | currency:'EUR'}}</td>
-            <td>
-              <button (click)="editerProduit(p)" class="btn btn-dark">
-                <i class="bi bi-pencil"></i>
-                Editer
-              </button>
-            </td>
-            <td>
-              <button (click)="supprimerProduit(p)" class="btn btn-danger">
-                <i class="bi bi-trash"></i>
-                Supprimer
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+
+<div class="mt-4">
+  <h3 class="mb-3">Liste des produits</h3>
+
+  <div class="mt-3 mb-4 d-flex align-items-center gap-3">
+    <!-- Search Input -->
+    <form [formGroup]="searchFormGroup" class="position-relative flex-grow-1">
+      <input
+        type="text"
+        formControlName="keyword"
+        placeholder="Rechercher un produit..."
+        class="form-control rounded-pill shadow-sm"
+        style="padding-left: 45px; border: 1px solid #ced4da; height: 50px;"
+      />
+      <i
+        class="bi bi-search position-absolute"
+        style="top: 50%; left: 15px; transform: translateY(-50%); font-size: 1.5rem; color: #6c757d;"
+      ></i>
+    </form>
+  
+    <!-- Libellé Dropdown -->
+    <select
+      class="form-select rounded-pill shadow-sm"
+      style="height: 50px; width: 200px;"
+      [(ngModel)]="selectedCategorie"
+      (change)="filterByCategorie(selectedCategorie)"
+    >
+      <option value="">Toutes les catégories</option>
+      <option *ngFor="let categorie of categories" [value]="categorie.libelle">
+        {{ categorie.libelle }}
+      </option>
+    </select>
   </div>
+  
+  <div *ngIf="produitsFiltered.length > 0; else noResults">
+    <table class="table table-bordered table-striped table-hover">
+      <thead class="table-dark">
+        <tr>
+          <th>Id</th>
+          <th>Code</th>
+          <th>Libellé</th>
+          <th>Désignation</th>
+          <th>Prix</th>
+          <th colspan="2" class="text-center">Actions</th>        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of produitsFiltered">
+          <td>{{ p.id }}</td>
+          <td>{{ p.code }}</td>
+          <td>
+            <span
+              class="categorie-libelle"
+              [ngClass]="{
+                'cat-1': p.categorie?.id === 1,
+                'cat-2': p.categorie?.id === 2,
+                'cat-3': p.categorie?.id === 3,
+                'cat-4': p.categorie?.id === 4,
+                'cat-5': p.categorie?.id === 5
+              }"
+            >
+              {{ p.categorie?.libelle }}
+            </span>
+          </td>
+          <td>{{ p.designation }}</td>
+          <td>{{ p.prix | currency : "EUR" }}</td>
+          <td class="text-center">
+            <button (click)="editerProduit(p)" class="btn btn-dark">
+              <i class="bi bi-pencil"></i> Editer
+            </button>
+          </td>
+          <td class="text-center">
+            <button (click)="supprimerProduit(p)" class="btn btn-danger">
+              <i class="bi bi-trash"></i> Supprimer
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <ng-template #noResults>
+    <div class="no-results-message">
+      <p>Aucun produit trouvé !</p>
+    </div>
+  </ng-template>
+
 </div>

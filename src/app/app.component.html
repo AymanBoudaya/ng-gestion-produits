@@ -1,21 +1,34 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary"> 
-    <div class="container"> 
-     <table>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <div class="container d-flex align-items-center">
+    <!-- Logo -->
+    <a class="navbar-brand d-flex align-items-center" routerLink="/">
+      <img
+        src="https://www.sonede.com.tn/wp-content/uploads/2024/03/cropped-logo-sonede-2_Plan-de-travail-1.png"
+        alt="Logo SONEDE"
+        class="logo me-2"
+      />
+      <span class="app-name">Gestion Produits</span>
+    </a>
+
+    <!-- Navigation Buttons -->
+    <table class="ms-auto">
       <tr>
         <td *ngFor="let action of actions">
-          <button class="btn"
-          (click)="setActionCourante(action)"
-          [ngClass]="action==actionCourante?'btn-primary':'btn-light'"
-          routerLink="{{action.route}}">
-          <i class="bi {{action.icon}}"></i>
-            {{action.titre}}
-          </button> 
-
+          <button
+            class="btn"
+            (click)="setActionCourante(action)"
+            [ngClass]="action == actionCourante ? 'btn-primary' : 'btn-light'"
+            routerLink="{{ action.route }}"
+          >
+            <i class="bi {{ action.icon }}"></i>
+            {{ action.titre }}
+          </button>
         </td>
       </tr>
-     </table>
-    </div> 
-  </nav> 
+    </table>
+  </div>
+</nav>
+
  
 <router-outlet> 
    

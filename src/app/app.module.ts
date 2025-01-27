@@ -6,21 +6,24 @@ import { AppComponent } from './app.component';
 import { AccueilComponent } from './accueil/accueil.component';
 import { ProduitsComponent } from './produits/produits.component';
 import { AjoutProduitComponent } from './ajout-produit/ajout-produit.component';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { AjoutCategorieComponent } from './ajout-categorie/ajout-categorie.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     AccueilComponent,
     ProduitsComponent,
-    AjoutProduitComponent
+    AjoutProduitComponent,
+    AjoutCategorieComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
-    HttpClientModule
+    HttpClientModule,
+    ReactiveFormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

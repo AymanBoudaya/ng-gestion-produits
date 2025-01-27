@@ -67,7 +67,73 @@ button.delete-button {
     color: white;
   }
   
+/* // couleurs catégories */
+.categorie-libelle {
+  display: inline-block;
+  padding: 5px 15px;
+  border-radius: 15px;
+  font-weight: bold;
+  color: white; /* Couleur du texte */
+  text-align: center;
+}
 
+.categorie-libelle.cat-1 {
+  background-color: #3498db; /* Bleu */
+}
+
+.categorie-libelle.cat-2 {
+  background-color: #e74c3c; /* Rouge */
+}
+
+.categorie-libelle.cat-3 {
+  background-color: #2ecc71; /* Vert */
+}
+
+.categorie-libelle.cat-4 {
+  background-color: #f39c12; /* Jaune */
+}
+
+.categorie-libelle.cat-5 {
+  background-color: #9b59b6; /* Violet */
+}
+
+.categorie-libelle.cat-6 {
+  background-color: #34495e; /* Gris foncé */
+}
+
+.categorie-libelle.cat-7 {
+  background-color: #1abc9c; /* Turquoise */
+}
+
+.categorie-libelle.cat-8 {
+  background-color: #16a085; /* Vert foncé */
+}
+
+.categorie-libelle.cat-9 {
+  background-color: #f1c40f; /* Or */
+}
+
+.categorie-libelle.cat-10 {
+  background-color: #e67e22; /* Orange */
+}
+
+/* Ajout d'un effet au survol */
+.categorie-libelle:hover {
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+.no-results-message {
+  background-color: #ff4d4d; /* Bright red background */
+  color: #fff; /* White text for good contrast */
+  padding: 15px; /* Add padding for better spacing */
+  border-radius: 8px; /* Rounded corners for a modern look */
+  text-align: center; /* Center align text */
+  font-weight: bold; /* Make the text bold */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add a subtle shadow */
+  margin: 20px auto; /* Center the message with some spacing */
+  max-width: 400px; /* Limit the width for better readability */
+}
 
 
 

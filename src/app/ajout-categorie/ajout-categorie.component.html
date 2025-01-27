@@ -1,0 +1,85 @@
+<div class="container mt-4">
+    <div class="card">
+      <div class="card-header">
+        <h1>{{EditMode? 'Editer' : 'Ajouter'}} Catégorie</h1>
+      </div>
+      <div class="card-body">
+        <form #categorieForm="ngForm" (ngSubmit)="validerFormulaire(categorieForm)">
+          <table class="table">
+            <tr>
+              <td>Code:</td>
+              <td>
+                <input
+                  class="form-control"
+                  type="text"
+                  name="code"
+                  [(ngModel)]="categorieCourante.code"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td>Libellé:</td>
+              <td>
+                <input
+                  class="form-control"
+                  type="text"
+                  name="libelle"
+                  [(ngModel)]="categorieCourante.libelle"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td [align]="'center'" colspan="2">
+                <input
+                  class="btn btn-success btn-lg"
+                  type="submit"
+                  value="Valider"
+                  [disabled]="!categorieForm.form.valid"
+                />
+              </td>
+            </tr>
+          </table>
+        </form>
+      </div>
+    </div>
+</div> 
+
+  <div class="mt-4">
+    <h1>liste des catégories</h1>
+    <!-- <form [formGroup]="searchFormGroup" (ngSubmit)="searchProduits()">
+      <div class="input-group">
+        <label class="input-group-text">Mot Clé</label>
+        <input type="text" class="form-control" formControlName="keyword"/>
+        <button class="btn btn-info">
+          <i class="bi bi-search"></i>
+        </button>
+      </div>
+    </form> -->
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>Code</th>
+          <th>Libellé </th>
+          <th colspan="2">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let c of categories">
+          <td>{{ c.id }}</td>
+          <td>{{ c.code }}</td>
+          <td>{{ c.libelle }}</td>
+          <td>
+            <button (click)="editerCategorie(c)" class="btn btn-dark">
+              <i class="bi bi-pencil"></i>
+              Editer
+            </button>
+            <button (click)="supprimerCategorie(c)" class="btn btn-danger">
+              <i class="bi bi-trash"></i>
+              Supprimer
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>  

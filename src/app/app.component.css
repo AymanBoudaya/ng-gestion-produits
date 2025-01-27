@@ -1,0 +1,27 @@
+/* Logo Styling */
+.logo {
+    width: 50px; /* Adjust size */
+    height: 50px;
+    border-radius: 50%; /* Make the image round */
+    object-fit: cover; /* Ensure proper scaling */
+    background-color: white; /* Add white background */
+    padding: 5px; /* Add padding to create a clear border around the image */
+  }
+  
+  /* App Name Styling */
+  .app-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white; /* Ensure good contrast on a primary background */
+  }
+  
+  /* Button Table */
+  table {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .btn {
+    margin: 5px;
+  }
+  

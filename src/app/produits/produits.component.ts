@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { Produit } from '../model/produit';
-import { NgForm } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
+import { Categorie, Produit } from '../model/produit';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { ProduitsService } from '../services/produits.service';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { CategorieService } from '../services/categorie.service';
 
 @Component({
   selector: 'app-produits',
@@ -10,127 +11,129 @@ import { ProduitsService } from '../services/produits.service';
   styleUrls: ['./produits.component.css']
 })
 export class ProduitsComponent implements OnInit {
-
+  searchFormGroup!: FormGroup;
+  produits: Produit[] = [];
+  categories: Categorie[] = []; // Liste des catégories
   produitCourant = new Produit();
-
-  produits: Produit[] = [
-    { id: 1, code: 'x12', designation: "Panier plastique", prix: 20 },
-    { id: 2, code: 'y4', designation: "table en bois", prix: 10 },
-    { id: 3, code: 'y10', designation: "salon en cuir", prix: 3000 }
-  ];
-  
-  constructor(private http: HttpClient, private produitsService :ProduitsService) {
-    
-  }
-  ngOnInit(): void {
-    //Message affiché au moment de l'affichage du composant 
-    console.log("Initialisation du composant:....."); 
-    //charger les données 
-    this.consulterProduits();  
-  }
-  
-  consulterProduits() {
-    console.log("Récupérer la liste des produits"); 
-    //Appeler la méthode 'getProduits' du service pour récupérer les données du JSON 
-    this.produitsService.getProduits()
-    .subscribe(
-      {
-        next: data => {
-          console.log("Succès GET");
-          this.produits = data;
-        },
-        error: err => {
-          console.log("Erreur GET");
-        }
-      }
-    )
-  }
-
   EditMode = false;
-  editerProduit(p: Produit) {
-    this.EditMode = true;
-    this.produitCourant = {
-      id: p.id,
-      code: p.code,
-      designation: p.designation,
-      prix: p.prix
-    };
-  }
-  mettreAJourProduit (nouveau : Produit, ancien :Produit) {
-    let reponse: boolean = confirm("Produit existant. Confirmez vous la mise à jour de :" + ancien.designation + " ?");
-    if (reponse == true) {       //mettre à jour dans le BackEnd   
-        this.produitsService.updateProduit(nouveau.id, nouveau)
-        .subscribe({
-            next: updatedProduit => {
-              console.log("Succès PUT");
-              //mettre à jour le produit aussi dans le tableau "produits" (FrontEnd) 
-              ancien.code = nouveau.code;
-              ancien.designation = nouveau.designation;
-              ancien.prix = nouveau.prix;
-              console.log('Mise à jour du produit:'+ ancien.designation);
-                this.EditMode = false;
-            },
-            error: err => { console.log("Erreur PUT");}
-          })}
-    else { console.log("Mise à jour annulée"); }
-    return; //Arrêter la boucle
+  produitsFiltered: Produit[] = []; // Liste filtrée pour l'affichage
+
+
+  constructor(private fb: FormBuilder, private produitsService: ProduitsService, private categorieService: CategorieService) {}
+
+  ngOnInit(): void {
+    this.searchFormGroup = this.fb.group({
+      keyword: this.fb.control('')
+    });
+    this.initForm();
+    this.loadProduits();
+    this.loadCategories();
+    // Mettre à jour la liste filtrée en fonction de la saisie dans le champ de recherche
+    this.searchFormGroup.get('keyword')?.valueChanges
+      .pipe(
+        debounceTime(300), // Attendre 300 ms avant de traiter une saisie
+        distinctUntilChanged() // Ignorer les valeurs répétées
+      )
+      .subscribe((value: string) => {
+        this.filtrerProduits(value);
+      });
   }
 
-  validerFormulaire(form: NgForm) {
-    console.log(form.value);
-    if (form.value.id != undefined) {
-      console.log("id non vide...");
-      //flag pour distinguer entre le mode AJOUT et le mode EDIT 
-      let nouveau: boolean = true;
-      let index = 0;
-      do {
-        let p = this.produits[index];
-        console.log(p.code + ' : ' + p.designation + ': ' + p.prix);
-        if (p.id == form.value.id) {
-          //rendre le mode à EDIT 
-          nouveau = false; 
-          console.log('ancien');
-          this.mettreAJourProduit(form.value,p)
-        }
-        else { index++; //continuer à boucler
-        }}
-      while (nouveau && index < this.produits.length);
-    }
-    else {console.log("id  vide...");}
+  initForm(): void {
+    this.searchFormGroup = this.fb.group({
+      keyword: this.fb.control('')
+    });
   }
 
-  verifierDoublon(p: Produit): boolean {
-    for (let i = 0; i < this.produits.length; i++) {
-      if (this.produits[i].id == p.id) {
-        return true
-      }
-    }
-    return false
+  loadProduits(): void {
+    this.produitsService.getProduits().subscribe({
+      next: (data) => {
+        console.log('Produits récupérés avec succès');
+        this.produits = data;
+        this.produitsFiltered = [...this.produits]; // Copier les produits pour le filtrage
+      },
+      error: (err) => console.error('Erreur lors du chargement des produits', err)
+    });
   }
 
-  supprimerProduit(produit : Produit) {
-    //Afficher une boite de dialogue pour confirmer la suppression
-    let reponse: boolean = confirm("Voulez vous supprimer le produit :" + produit.designation + " ?");
-    if (reponse == true) {
-      console.log("Suppression confirmée...");
-      this.produitsService.deleteProduit(produit.id)
-      .subscribe({
-        next : (params) => {  
-      //chercher l'indice du produit à supprimer 
-      let index: number = this.produits.indexOf(produit);
-      console.log("indice du produit à supprimer: " + index);
-      if (index !== -1) {
-        // supprimer le produit référencé
-        this.produits.splice(index, 1);
-      }  
+  loadCategories(): void {
+    this.categorieService.getCategories().subscribe({
+      next: (data) => {
+        this.categories = data;
+      },
+      error: (err) => console.error('Erreur lors du chargement des catégories', err)
+    });
+  }
+
+  validerFormulaire(): void {
+    if (this.produitCourant.id) {
+      this.produitsService.updateProduit(this.produitCourant).subscribe({
+        next: () => {
+          const index = this.produits.findIndex(p => p.id === this.produitCourant.id);
+          if (index !== -1) this.produits[index] = { ...this.produitCourant };
+          this.EditMode = false;
+          console.log('Produit mis à jour avec succès');
         },
-        error : console.log
-      })
-    }
-    else {
-      console.log("Suppression annulée...");
+        error: (err) => console.error('Erreur lors de la mise à jour du produit', err)
+      });
+    } else {
+      // Création d'un nouveau produit
+      this.produitsService.addProduit(this.produitCourant).subscribe({
+        next: (newProduit) => {
+          this.produits.push(newProduit);
+          this.EditMode = false;
+          console.log('Produit ajouté avec succès');
+        },
+        error: (err) => console.error('Erreur lors de l\'ajout du produit', err)
+      });
     }
   }
 
+  editerProduit(produit: Produit): void {
+    this.produitCourant = { ...produit     };
+    this.EditMode = true;
+    // afficher le produit courant dans la liste déroulante
+    this.produitCourant.categorie = this.categories.find(c => c.id === this.produitCourant.categorie!.id);
+    console.log('Produit courant sélectionné:', this.produitCourant);
 
+  }
+
+  supprimerProduit(produit: Produit): void {
+    if (confirm(`Voulez-vous supprimer le produit "${produit.designation}" ?`)) {
+      this.produitsService.deleteProduit(produit).subscribe({
+        next: () => {
+          this.produits = this.produits.filter(p => p.id !== produit.id);
+          this.produitsFiltered = [...this.produits];
+          console.log('Produit supprimé avec succès');
+        },
+        error: (err) => console.error('Erreur lors de la suppression du produit', err)
+      });
+    }
+  }
+
+  filtrerProduits(keyword: string) {
+    const normalizedKeyword = keyword.toLowerCase().trim();
+
+    if (!normalizedKeyword) {
+      // Si le champ est vide, afficher tous les produits
+      this.produitsFiltered = [...this.produits];
+    } else {
+      // Filtrer les produits en fonction du mot-clé
+      this.produitsFiltered = this.produits.filter((p) =>
+        p.designation?.toLowerCase().includes(normalizedKeyword)
+      );
+    }
+  }
+
+  selectedCategorie: string = '';
+  filterByCategorie(categorie: string): void {
+    const keyword = this.searchFormGroup.get('keyword')?.value?.toLowerCase() ?? '';
+    
+    this.produitsFiltered = this.produits.filter((produit) => {
+      const matchesKeyword = (produit.designation?.toLowerCase() ?? '').includes(keyword);
+      const matchesCategorie = !categorie || produit.categorie?.libelle === categorie;
+      return matchesKeyword && matchesCategorie;
+    });
+  }
+  
 }
